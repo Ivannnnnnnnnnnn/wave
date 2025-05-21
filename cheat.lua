@@ -4,24 +4,27 @@ local rs = game:GetService("RunService")
 local lp = players.LocalPlayer
 local cam = workspace.CurrentCamera
 
-local WaveUI = Instance.new("ScreenGui", game.CoreGui)
+local WaveUI = Instance.new("ScreenGui")
 WaveUI.ResetOnSpawn = false
 WaveUI.Name = "WaveUI"
+WaveUI.Parent = game.CoreGui
 
-local Main = Instance.new("Frame", WaveUI)
+local Main = Instance.new("Frame")
 Main.Size = UDim2.new(0, 400, 0, 300)
 Main.Position = UDim2.new(0.5, -200, 0.5, -150)
 Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Main.Draggable = true
-Main.Active = true
+Main.Parent = WaveUI
 
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
 
-local TabBar = Instance.new("Frame", Main)
-TabBar.Size = UDim2.new(1, 0, 0, 50)
+local TabBar = Instance.new("Frame")
+TabBar.Size = UDim2.new(0, 50, 1, 0)
+TabBar.Position = UDim2.new(0, 0, 0, 0)
 TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TabBar.Parent = Main
+TabBar.ZIndex = 5
 
-local iconBase = "https://github.com/Ivannnnnnnnnnnn/wave/tree/main/assets/"
+local iconBase = "https://raw.githubusercontent.com/Ivannnnnnnnnnnn/wave/main/assets/"
 local icons = {
     aimbot = iconBase.."aimbot.png",
     visuals = iconBase.."visuals.png",
@@ -39,11 +42,13 @@ local function switchTab(name)
 end
 
 local function createTab(name, icon, index)
-    local btn = Instance.new("ImageButton", TabBar)
+    local btn = Instance.new("ImageButton")
     btn.Size = UDim2.new(0, 40, 0, 40)
-    btn.Position = UDim2.new(0, 10 + (50 * (index - 1)), 0, 5)
+    btn.Position = UDim2.new(0, 5, 0, 10 + (50 * (index - 1)))
     btn.Image = icon
     btn.BackgroundTransparency = 1
+    btn.Parent = TabBar
+    btn.ZIndex = 10
     btn.MouseButton1Click:Connect(function()
         switchTab(name)
     end)
@@ -51,11 +56,13 @@ local function createTab(name, icon, index)
 end
 
 local function createPage(name)
-    local page = Instance.new("Frame", Main)
-    page.Size = UDim2.new(1, 0, 1, -50)
-    page.Position = UDim2.new(0, 0, 0, 50)
+    local page = Instance.new("Frame")
+    page.Size = UDim2.new(1, -50, 1, 0)
+    page.Position = UDim2.new(0, 50, 0, 0)
     page.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     page.Visible = false
+    page.Parent = Main
+    page.ZIndex = 5
     Pages[name] = page
     return page
 end
@@ -68,14 +75,15 @@ local aimbotPage = createPage("aimbot")
 local visualsPage = createPage("visuals")
 local localPage = createPage("local")
 
+-- Aimbot toggle button
 local aimbotEnabled = false
-
-local aimbotBtn = Instance.new("TextButton", aimbotPage)
+local aimbotBtn = Instance.new("TextButton")
 aimbotBtn.Size = UDim2.new(0, 120, 0, 30)
 aimbotBtn.Position = UDim2.new(0, 20, 0, 20)
 aimbotBtn.Text = "Aimbot: OFF"
 aimbotBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 aimbotBtn.TextColor3 = Color3.new(1, 1, 1)
+aimbotBtn.Parent = aimbotPage
 aimbotBtn.MouseButton1Click:Connect(function()
     aimbotEnabled = not aimbotEnabled
     aimbotBtn.Text = "Aimbot: " .. (aimbotEnabled and "ON" or "OFF")
@@ -104,32 +112,36 @@ rs.RenderStepped:Connect(function()
     end
 end)
 
+-- ESP toggles
 local showBoxes, showNames = false, false
 
-local espToggle = Instance.new("TextButton", visualsPage)
+local espToggle = Instance.new("TextButton")
 espToggle.Size = UDim2.new(0, 120, 0, 30)
 espToggle.Position = UDim2.new(0, 20, 0, 20)
 espToggle.Text = "ESP Boxes: OFF"
 espToggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 espToggle.TextColor3 = Color3.new(1, 1, 1)
+espToggle.Parent = visualsPage
 espToggle.MouseButton1Click:Connect(function()
     showBoxes = not showBoxes
     espToggle.Text = "ESP Boxes: " .. (showBoxes and "ON" or "OFF")
 end)
 
-local nameToggle = Instance.new("TextButton", visualsPage)
+local nameToggle = Instance.new("TextButton")
 nameToggle.Size = UDim2.new(0, 120, 0, 30)
 nameToggle.Position = UDim2.new(0, 20, 0, 60)
 nameToggle.Text = "Name ESP: OFF"
 nameToggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 nameToggle.TextColor3 = Color3.new(1, 1, 1)
+nameToggle.Parent = visualsPage
 nameToggle.MouseButton1Click:Connect(function()
     showNames = not showNames
     nameToggle.Text = "Name ESP: " .. (showNames and "ON" or "OFF")
 end)
 
-local espFolder = Instance.new("Folder", WaveUI)
+local espFolder = Instance.new("Folder")
 espFolder.Name = "ESPFolder"
+espFolder.Parent = WaveUI
 
 rs.RenderStepped:Connect(function()
     espFolder:ClearAllChildren()
@@ -140,7 +152,7 @@ rs.RenderStepped:Connect(function()
             local pos, vis = cam:WorldToViewportPoint(p.Character.Head.Position)
             if vis then
                 if showNames then
-                    local name = Instance.new("TextLabel", espFolder)
+                    local name = Instance.new("TextLabel")
                     name.Text = p.Name
                     name.Position = UDim2.new(0, pos.X, 0, pos.Y - 15)
                     name.Size = UDim2.new(0, 100, 0, 20)
@@ -148,46 +160,94 @@ rs.RenderStepped:Connect(function()
                     name.BackgroundTransparency = 1
                     name.Font = Enum.Font.SourceSansBold
                     name.TextSize = 14
+                    name.Parent = espFolder
                 end
                 if showBoxes then
-                    local box = Instance.new("Frame", espFolder)
+                    local box = Instance.new("Frame")
                     box.Size = UDim2.new(0, 40, 0, 60)
                     box.Position = UDim2.new(0, pos.X - 20, 0, pos.Y - 30)
                     box.BackgroundColor3 = Color3.new(1,0,0)
                     box.BorderSizePixel = 0
                     box.BackgroundTransparency = 0.5
+                    box.Parent = espFolder
                 end
             end
         end
     end
 end)
 
-local wsSlider = Instance.new("TextBox", localPage)
+-- Local player settings
+local wsSlider = Instance.new("TextBox")
 wsSlider.Size = UDim2.new(0, 140, 0, 30)
 wsSlider.Position = UDim2.new(0, 20, 0, 20)
 wsSlider.PlaceholderText = "Walkspeed (default 16)"
 wsSlider.Text = ""
 wsSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 wsSlider.TextColor3 = Color3.new(1, 1, 1)
+wsSlider.Parent = localPage
 wsSlider.FocusLost:Connect(function()
     local val = tonumber(wsSlider.Text)
-    if val then
+    if val and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
         lp.Character.Humanoid.WalkSpeed = val
     end
 end)
 
-local jpSlider = Instance.new("TextBox", localPage)
+local jpSlider = Instance.new("TextBox")
 jpSlider.Size = UDim2.new(0, 140, 0, 30)
 jpSlider.Position = UDim2.new(0, 20, 0, 60)
 jpSlider.PlaceholderText = "JumpPower (default 50)"
 jpSlider.Text = ""
 jpSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 jpSlider.TextColor3 = Color3.new(1, 1, 1)
+jpSlider.Parent = localPage
 jpSlider.FocusLost:Connect(function()
     local val = tonumber(jpSlider.Text)
-    if val then
+    if val and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
         lp.Character.Humanoid.JumpPower = val
     end
 end)
 
 switchTab("aimbot")
+
+-- Toggle GUI visibility on Insert key
+uis.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Insert then
+        WaveUI.Enabled = not WaveUI.Enabled
+    end
+end)
+
+-- Manual dragging for Main frame
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                             startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Main.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+uis.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
