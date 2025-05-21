@@ -8,7 +8,6 @@ local WaveUI = Instance.new("ScreenGui", game.CoreGui)
 WaveUI.ResetOnSpawn = false
 WaveUI.Name = "WaveUI"
 
--- === Main GUI Frame ===
 local Main = Instance.new("Frame", WaveUI)
 Main.Size = UDim2.new(0, 400, 0, 300)
 Main.Position = UDim2.new(0.5, -200, 0.5, -150)
@@ -18,12 +17,10 @@ Main.Active = true
 
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
 
--- === Tab Bar ===
 local TabBar = Instance.new("Frame", Main)
 TabBar.Size = UDim2.new(1, 0, 0, 50)
 TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 
--- === Icon URLs (replace with your GitHub raw paths) ===
 local iconBase = "https://github.com/Ivannnnnnnnnnnn/wave/tree/main/assets/"
 local icons = {
     aimbot = iconBase.."aimbot.png",
@@ -31,7 +28,6 @@ local icons = {
     localtab = iconBase.."local.png",
 }
 
--- === Tabs & Pages ===
 local Tabs, Pages = {}, {}
 local currentPage = nil
 
@@ -64,7 +60,6 @@ local function createPage(name)
     return page
 end
 
--- Create all tabs and pages
 createTab("aimbot", icons.aimbot, 1)
 createTab("visuals", icons.visuals, 2)
 createTab("local", icons.localtab, 3)
@@ -73,7 +68,6 @@ local aimbotPage = createPage("aimbot")
 local visualsPage = createPage("visuals")
 local localPage = createPage("local")
 
--- === Aimbot ===
 local aimbotEnabled = false
 
 local aimbotBtn = Instance.new("TextButton", aimbotPage)
@@ -87,7 +81,6 @@ aimbotBtn.MouseButton1Click:Connect(function()
     aimbotBtn.Text = "Aimbot: " .. (aimbotEnabled and "ON" or "OFF")
 end)
 
--- Aimbot logic
 rs.RenderStepped:Connect(function()
     if not aimbotEnabled then return end
     if not uis:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then return end
@@ -111,7 +104,6 @@ rs.RenderStepped:Connect(function()
     end
 end)
 
--- === Visuals ===
 local showBoxes, showNames = false, false
 
 local espToggle = Instance.new("TextButton", visualsPage)
@@ -136,7 +128,6 @@ nameToggle.MouseButton1Click:Connect(function()
     nameToggle.Text = "Name ESP: " .. (showNames and "ON" or "OFF")
 end)
 
--- ESP logic
 local espFolder = Instance.new("Folder", WaveUI)
 espFolder.Name = "ESPFolder"
 
@@ -171,7 +162,6 @@ rs.RenderStepped:Connect(function()
     end
 end)
 
--- === Local (Walkspeed / JumpPower) ===
 local wsSlider = Instance.new("TextBox", localPage)
 wsSlider.Size = UDim2.new(0, 140, 0, 30)
 wsSlider.Position = UDim2.new(0, 20, 0, 20)
@@ -200,5 +190,4 @@ jpSlider.FocusLost:Connect(function()
     end
 end)
 
--- Show default tab
 switchTab("aimbot")
