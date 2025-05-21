@@ -1,6 +1,8 @@
 # wave
 ## !!!DO NOT USE INGAME THE CHEAT IS NOT FINISHED AND IS CURRENTLY UNSAFE!!!
 
+**Cheat currently has some functions that kind of work but are unsafe**
+
 ## Wave - Combat Surf Cheat Features
 
 ### Planned features
@@ -15,3 +17,4 @@
 - **Local Player Enhancements**
   - Adjustable WalkSpeed
   - Adjustable JumpPower
+
