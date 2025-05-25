@@ -5,14 +5,16 @@
 
 ### Planned features
 - **Aimbot**
-  - Toggle ON/OFF
-  - Automatically aims at the nearest visible enemy head when holding right mouse button
+  - Aimbot (Hold RMB to aim at enemies)
+  - Team Check
 
 - **Visuals (ESP)**
   - Player boxes
-  - Name tags
+  - aimbot FOV
+  - FOV radius
+  - ESP color
 
-- **Local Player Enhancements**
-  - Adjustable WalkSpeed
-  - Adjustable JumpPower
+- **MISC**
+- ???
+- ???
 
