@@ -204,7 +204,6 @@ local function updateUI()
         makeSlider("FOV Radius", 130, 10, 300, "fov")
         makeColorPicker(180)
     elseif currentTab == "Misc" then
-        -- placeholder for future features
     end
 end
 
