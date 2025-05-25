@@ -3,7 +3,7 @@
 
 **Cheat currently has some functions that kind of work but are unsafe**
 
-## Wave - Combat Surf Cheat Features
+## Wave - Universal roblox cheat for multiple games
 
 ### Planned features
 - **Aimbot**
