@@ -1,237 +1,138 @@
-local UserInputService = game:GetService("UserInputService")
+loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-
-local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local UIS = game:GetService("UserInputService")
 
-local WaveUI = Instance.new("ScreenGui")
-WaveUI.Name = "WaveUI"
-WaveUI.ResetOnSpawn = false
-WaveUI.Parent = game.CoreGui
+local settings = {
+    espEnabled = true,
+    aimAssistEnabled = true,
+    aimFOV = 100,
+    aimPart = "Head",
+    aimBind = Enum.UserInputType.MouseButton2,
+    espColor = Color3.fromRGB(255, 0, 0)
+}
 
-local MainFrame = Instance.new("Frame", WaveUI)
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.Active = true
-MainFrame.Draggable = true
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+local aiming = false
+local espTable = {}
+local fovCircle = Drawing.new("Circle")
+fovCircle.Radius = settings.aimFOV
+fovCircle.Thickness = 2
+fovCircle.Transparency = 0.4
+fovCircle.Color = Color3.fromRGB(255, 255, 255)
+fovCircle.Filled = false
+fovCircle.Visible = true
 
-local TabBar = Instance.new("Frame", MainFrame)
-TabBar.Size = UDim2.new(0, 50, 1, 0)
-TabBar.Position = UDim2.new(0, 0, 0, 0)
-TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-
-local TabNames = {"aimbot", "visuals", "local"}
-local Tabs = {}
-local Pages = {}
-
-local tabDefaultColor = Color3.fromRGB(50, 50, 50)
-local tabSelectedColor = Color3.fromRGB(70, 130, 230)
-
-local currentPage = nil
-
-local function switchTab(name)
-    for tabName, page in pairs(Pages) do
-        page.Visible = (tabName == name)
-        Tabs[tabName].BackgroundColor3 = tabDefaultColor
-    end
-    Tabs[name].BackgroundColor3 = tabSelectedColor
-    currentPage = name
+local function createESP(player)
+    local box = Drawing.new("Square")
+    box.Thickness = 1
+    box.Filled = true
+    box.Transparency = 0.3
+    box.Color = settings.espColor
+    box.Visible = false
+    return {box = box, player = player}
 end
 
-local function createTab(name, index)
-    local btn = Instance.new("TextButton", TabBar)
-    btn.Size = UDim2.new(1, 0, 0, 50)
-    btn.Position = UDim2.new(0, 0, 0, (index - 1) * 50)
-    btn.Text = name:sub(1,1):upper() .. name:sub(2)
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.BackgroundColor3 = tabDefaultColor
-    btn.BorderSizePixel = 0
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 18
-    btn.AutoButtonColor = false
-
-    btn.MouseButton1Click:Connect(function()
-        switchTab(name)
-    end)
-
-    Tabs[name] = btn
-end
-
-local function createPage(name)
-    local page = Instance.new("Frame", MainFrame)
-    page.Size = UDim2.new(1, -50, 1, 0)
-    page.Position = UDim2.new(0, 50, 0, 0)
-    page.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    page.Visible = false
-    Pages[name] = page
-    return page
-end
-
-for i, name in ipairs(TabNames) do
-    createTab(name, i)
-    createPage(name)
-end
-
-local aimbotPage = Pages["aimbot"]
-local aimbotEnabled = false
-
-local aimbotBtn = Instance.new("TextButton", aimbotPage)
-aimbotBtn.Size = UDim2.new(0, 150, 0, 40)
-aimbotBtn.Position = UDim2.new(0, 20, 0, 20)
-aimbotBtn.Text = "Aimbot: OFF"
-aimbotBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-aimbotBtn.TextColor3 = Color3.new(1, 1, 1)
-aimbotBtn.Font = Enum.Font.SourceSansBold
-aimbotBtn.TextSize = 18
-aimbotBtn.BorderSizePixel = 0
-aimbotBtn.AutoButtonColor = false
-aimbotBtn.MouseButton1Click:Connect(function()
-    aimbotEnabled = not aimbotEnabled
-    aimbotBtn.Text = "Aimbot: " .. (aimbotEnabled and "ON" or "OFF")
-end)
-
-RunService.RenderStepped:Connect(function()
-    if not aimbotEnabled then return end
-    if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then return end
-
-    local closestPlayer, closestDistance = nil, math.huge
-
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") and player.Team ~= LocalPlayer.Team then
-            local screenPos, onScreen = Camera:WorldToViewportPoint(player.Character.Head.Position)
+local function getClosestTarget()
+    local closest, shortest = nil, math.huge
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild(settings.aimPart) then
+            local pos, onScreen = Camera:WorldToViewportPoint(player.Character[settings.aimPart].Position)
             if onScreen then
-                local dist = (Vector2.new(screenPos.X, screenPos.Y) - UserInputService:GetMouseLocation()).Magnitude
-                if dist < closestDistance then
-                    closestDistance = dist
-                    closestPlayer = player
+                local dist = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                if dist < settings.aimFOV and dist < shortest then
+                    closest, shortest = player, dist
                 end
             end
         end
     end
+    return closest
+end
 
-    if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
-        Camera.CFrame = CFrame.new(Camera.CFrame.Position, closestPlayer.Character.Head.Position)
+UIS.InputBegan:Connect(function(input)
+    if input.UserInputType == settings.aimBind then
+        aiming = true
     end
 end)
 
-local visualsPage = Pages["visuals"]
-local showBoxes = false
-local showNames = false
-
-local espToggle = Instance.new("TextButton", visualsPage)
-espToggle.Size = UDim2.new(0, 150, 0, 40)
-espToggle.Position = UDim2.new(0, 20, 0, 20)
-espToggle.Text = "ESP Boxes: OFF"
-espToggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-espToggle.TextColor3 = Color3.new(1, 1, 1)
-espToggle.Font = Enum.Font.SourceSansBold
-espToggle.TextSize = 18
-espToggle.BorderSizePixel = 0
-espToggle.AutoButtonColor = false
-espToggle.MouseButton1Click:Connect(function()
-    showBoxes = not showBoxes
-    espToggle.Text = "ESP Boxes: " .. (showBoxes and "ON" or "OFF")
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == settings.aimBind then
+        aiming = false
+    end
 end)
-
-local nameToggle = Instance.new("TextButton", visualsPage)
-nameToggle.Size = UDim2.new(0, 150, 0, 40)
-nameToggle.Position = UDim2.new(0, 20, 0, 80)
-nameToggle.Text = "Name ESP: OFF"
-nameToggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-nameToggle.TextColor3 = Color3.new(1, 1, 1)
-nameToggle.Font = Enum.Font.SourceSansBold
-nameToggle.TextSize = 18
-nameToggle.BorderSizePixel = 0
-nameToggle.AutoButtonColor = false
-nameToggle.MouseButton1Click:Connect(function()
-    showNames = not showNames
-    nameToggle.Text = "Name ESP: " .. (showNames and "ON" or "OFF")
-end)
-
-local espFolder = Instance.new("Folder", WaveUI)
-espFolder.Name = "ESPFolder"
 
 RunService.RenderStepped:Connect(function()
-    espFolder:ClearAllChildren()
-    if not (showBoxes or showNames) then return end
-
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            local screenPos, onScreen = Camera:WorldToViewportPoint(player.Character.Head.Position)
-            if onScreen then
-                if showNames then
-                    local nameLabel = Instance.new("TextLabel", espFolder)
-                    nameLabel.Text = player.Name
-                    nameLabel.Position = UDim2.new(0, screenPos.X, 0, screenPos.Y - 15)
-                    nameLabel.Size = UDim2.new(0, 100, 0, 20)
-                    nameLabel.TextColor3 = Color3.new(1, 1, 1)
-                    nameLabel.BackgroundTransparency = 1
-                    nameLabel.Font = Enum.Font.SourceSansBold
-                    nameLabel.TextSize = 14
-                end
-
-                if showBoxes then
-                    local box = Instance.new("Frame", espFolder)
-                    box.Size = UDim2.new(0, 40, 0, 60)
-                    box.Position = UDim2.new(0, screenPos.X - 20, 0, screenPos.Y - 30)
-                    box.BackgroundColor3 = Color3.new(1, 0, 0)
-                    box.BorderSizePixel = 0
-                    box.BackgroundTransparency = 0.5
-                end
+    fovCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+    fovCircle.Radius = settings.aimFOV
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if not espTable[player] then
+                espTable[player] = createESP(player)
+            end
+            local esp = espTable[player]
+            local pos, visible = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+            local head = player.Character:FindFirstChild("Head")
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if visible and settings.espEnabled and head and humanoid then
+                local scale = 1 / (Camera.CFrame.Position - head.Position).Magnitude * 100
+                local size = Vector2.new(40 * scale, 80 * scale)
+                esp.box.Position = Vector2.new(pos.X - size.X / 2, pos.Y - size.Y / 2)
+                esp.box.Size = size
+                esp.box.Color = settings.espColor
+                esp.box.Visible = true
+            else
+                esp.box.Visible = false
             end
         end
     end
-end)
-
-local localPage = Pages["local"]
-
-local wsInput = Instance.new("TextBox", localPage)
-wsInput.Size = UDim2.new(0, 150, 0, 40)
-wsInput.Position = UDim2.new(0, 20, 0, 20)
-wsInput.PlaceholderText = "WalkSpeed (default 16)"
-wsInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-wsInput.TextColor3 = Color3.new(1, 1, 1)
-wsInput.Font = Enum.Font.SourceSansBold
-wsInput.TextSize = 18
-wsInput.ClearTextOnFocus = false
-wsInput.BorderSizePixel = 0
-wsInput.AutoLocalize = false
-wsInput.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        local val = tonumber(wsInput.Text)
-        if val and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.WalkSpeed = val
+    if settings.aimAssistEnabled and aiming then
+        local target = getClosestTarget()
+        if target and target.Character and target.Character:FindFirstChild(settings.aimPart) then
+            local partPos = target.Character[settings.aimPart].Position
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, partPos)
         end
     end
 end)
 
-local jpInput = Instance.new("TextBox", localPage)
-jpInput.Size = UDim2.new(0, 150, 0, 40)
-jpInput.Position = UDim2.new(0, 20, 0, 80)
-jpInput.PlaceholderText = "JumpPower (default 50)"
-jpInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-jpInput.TextColor3 = Color3.new(1, 1, 1)
-jpInput.Font = Enum.Font.SourceSansBold
-jpInput.TextSize = 18
-jpInput.ClearTextOnFocus = false
-jpInput.BorderSizePixel = 0
-jpInput.AutoLocalize = false
-jpInput.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        local val = tonumber(jpInput.Text)
-        if val and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.JumpPower = val
-        end
-    end
-end)
+local UI = Rayfield:CreateWindow({
+    Name = "Wave | Universal FPS Cheat",
+    LoadingTitle = "Wave Loading...",
+    ConfigurationSaving = {Enabled = false}
+})
 
-switchTab("aimbot")
-
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.Insert then
-        WaveUI.Enabled = not WaveUI.Enabled
+local aimbotTab = UI:CreateTab("Aimbot", 4483362458)
+aimbotTab:CreateToggle({
+    Name = "Enable Aimbot",
+    CurrentValue = true,
+    Callback = function(v)
+        settings.aimAssistEnabled = v
     end
-end)
+})
+aimbotTab:CreateSlider({
+    Name = "Aimbot FOV Radius",
+    Range = {10, 300},
+    Increment = 5,
+    CurrentValue = settings.aimFOV,
+    Callback = function(v)
+        settings.aimFOV = v
+        fovCircle.Radius = v
+    end
+})
+
+local espTab = UI:CreateTab("ESP", 4483362458)
+espTab:CreateToggle({
+    Name = "Enable ESP",
+    CurrentValue = true,
+    Callback = function(v)
+        settings.espEnabled = v
+    end
+})
+espTab:CreateColorPicker({
+    Name = "ESP Box Color",
+    Color = settings.espColor,
+    Callback = function(color)
+        settings.espColor = color
+    end
+})
