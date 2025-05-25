@@ -1,7 +1,5 @@
 # wave
-## !!!DO NOT USE INGAME THE CHEAT IS NOT FINISHED AND IS CURRENTLY UNSAFE!!!
-
-**Cheat currently has some functions that kind of work but are unsafe**
+## vV0.2 prototype, it currently works tho i do not guarantee safety USE AT YOUR OWN RISK
 
 ## Wave - Universal roblox cheat for multiple games
 
