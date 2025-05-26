@@ -1,5 +1,5 @@
 # wave
-## V0.3 prototype, it currently works tho i do not guarantee safety USE AT YOUR OWN RISK
+## V0.3.1 prototype, it currently works tho i do not guarantee safety USE AT YOUR OWN RISK
 
 ## Wave - Universal roblox cheat for multiple games
 
