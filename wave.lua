@@ -1,14 +1,30 @@
 local splashGui = Instance.new("ScreenGui", game.CoreGui)
 splashGui.Name = "WaveSplash"
 
-local splashText = Instance.new("TextLabel", splashGui)
-splashText.Size = UDim2.new(0, 300, 0, 100)
-splashText.Position = UDim2.new(0.5, -150, 0.5, -50)
+local frame = Instance.new("Frame", splashGui)
+frame.Size = UDim2.new(0, 300, 0, 100)
+frame.Position = UDim2.new(0.5, -150, 0.5, -50)
+frame.BackgroundTransparency = 1
+
+local gradient = Instance.new("UIGradient", frame)
+gradient.Rotation = 0
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 102, 204)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(173, 216, 230)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+}
+
+local splashText = Instance.new("TextLabel", frame)
+splashText.Size = UDim2.new(1, 0, 1, 0)
+splashText.BackgroundTransparency = 1
 splashText.Text = "Wave"
 splashText.Font = Enum.Font.SourceSansBold
 splashText.TextScaled = true
-splashText.BackgroundTransparency = 1
-splashText.TextColor3 = Color3.fromRGB(0, 102, 204)
+splashText.TextColor3 = Color3.new(1, 1, 1)
+
+local stroke = Instance.new("TextStroke", splashText)
+stroke.Transparency = 0.5
+stroke.Color = Color3.fromRGB(0, 70, 140)
 
 task.spawn(function()
     local start = tick()
@@ -17,32 +33,16 @@ task.spawn(function()
     while tick() - start < duration do
         local t = tick() - start
         local yOffset = math.sin(t * math.pi * 2) * 10
-        splashText.Position = UDim2.new(0.5, -150, 0.5, -50 + yOffset)
-        local progress = t / duration
-        if progress < 0.5 then
-            local interp = progress / 0.5
-            splashText.TextColor3 = Color3.new(
-                0 + (173/255 * interp),
-                102/255 + (216/255 - 102/255) * interp,
-                204/255 + (230/255 - 204/255) * interp
-            )
-        else
-            local interp = (progress - 0.5) / 0.5
-            splashText.TextColor3 = Color3.new(
-                173/255 + (1 - 173/255) * interp,
-                216/255 + (1 - 216/255) * interp,
-                230/255 + (1 - 230/255) * interp
-            )
-        end
-
+        frame.Position = UDim2.new(0.5, -150, 0.5, -50 + yOffset)
+        gradient.Offset = Vector2.new((t * 2) % 1, 0)
         if t > duration - 1 then
             alpha = 1 - (t - (duration - 1))
             splashText.TextTransparency = 1 - alpha
+            stroke.Transparency = 0.5 + 0.5 * (1 - alpha)
+            gradient.Transparency = NumberSequence.new(1 - alpha)
         end
-
         task.wait()
     end
-
     splashGui:Destroy()
 end)
 
