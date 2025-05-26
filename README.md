@@ -1,6 +1,10 @@
+![banner](https://github.com/user-attachments/assets/3bc26d70-9350-43aa-916d-1dee43959815)
 # Wave
 ## V0.3.1 Prototype  
 ⚠️ It currently works but I do **not guarantee safety** — **USE AT YOUR OWN RISK**
+
+## Join Our Discord  
+[https://discord.gg/89Z9MGQN9J](https://discord.gg/89Z9MGQN9J)
 
 ---
 
@@ -31,8 +35,3 @@
 
 **Rivals (another popular game)**  
 ![Screenshot 2025-05-26 154356](https://github.com/user-attachments/assets/72c12f9f-3658-481e-8e5d-5a5be31dd5aa)
-
----
-
-## Join Our Discord  
-[https://discord.gg/89Z9MGQN9J](https://discord.gg/89Z9MGQN9J)
