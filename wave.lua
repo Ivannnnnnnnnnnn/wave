@@ -1,3 +1,32 @@
+local splashGui = Instance.new("ScreenGui", game.CoreGui)
+splashGui.Name = "WaveSplash"
+
+local splashText = Instance.new("TextLabel", splashGui)
+splashText.Size = UDim2.new(0, 300, 0, 100)
+splashText.Position = UDim2.new(0.5, -150, 0.5, -50)
+splashText.Text = "Wave"
+splashText.TextColor3 = Color3.new(1, 1, 1)
+splashText.Font = Enum.Font.SourceSansBold
+splashText.TextScaled = true
+splashText.BackgroundTransparency = 1
+
+task.spawn(function()
+    local start = tick()
+    local duration = 3
+    local alpha = 1
+    while tick() - start < duration do
+        local t = tick() - start
+        local yOffset = math.sin(t * math.pi * 2) * 10
+        splashText.Position = UDim2.new(0.5, -150, 0.5, -50 + yOffset)
+        if t > duration - 1 then
+            alpha = 1 - (t - (duration - 1))
+            splashText.TextTransparency = 1 - alpha
+        end
+        task.wait()
+    end
+    splashGui:Destroy()
+end)
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -9,6 +38,9 @@ local settings = {
     aimEnabled = true,
     teamCheck = true,
     fovVisible = true,
+        bhopEnabled = false,
+    speedhackEnabled = false,
+    speedValue = 20,
     fov = 100,
     aimPart = "Head",
     aimKey = Enum.UserInputType.MouseButton2,
@@ -60,6 +92,19 @@ local function getClosest()
         end
     end
     return closest
+end
+
+if settings.bhopEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+    local humanoid = LP.Character.Humanoid
+    if UIS:IsKeyDown(Enum.KeyCode.Space) and humanoid.FloorMaterial ~= Enum.Material.Air then
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end
+
+if settings.speedhackEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+    LP.Character.Humanoid.WalkSpeed = settings.speedValue
+elseif LP.Character and LP.Character:FindFirstChild("Humanoid") then
+    LP.Character.Humanoid.WalkSpeed = 16
 end
 
 RunService.RenderStepped:Connect(function()
@@ -204,6 +249,9 @@ local function updateUI()
         makeSlider("FOV Radius", 130, 10, 300, "fov")
         makeColorPicker(180)
     elseif currentTab == "Misc" then
+        makeToggle("Bunnyhop", 70, "bhopEnabled")
+        makeToggle("Speedhack", 100, "speedhackEnabled")
+        makeSlider("Speed", 130, 16, 100, "speedValue")
     end
 end
 
