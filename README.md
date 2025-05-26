@@ -1,27 +1,38 @@
-# wave
-## V0.3.1 prototype, it currently works tho i do not guarantee safety USE AT YOUR OWN RISK
+# Wave
+## V0.3.1 Prototype  
+⚠️ It currently works but I do **not guarantee safety** — **USE AT YOUR OWN RISK**
 
-## Wave - Universal roblox cheat for multiple games
+---
 
-### Planned features
-- **Aimbot**
-  - Aimbot (Hold RMB to aim at enemies)
-  - Team Check
+## Wave — Universal Roblox Cheat for Multiple Games
 
-- **Visuals (ESP)**
-  - Player boxes
-  - aimbot FOV
-  - FOV radius
-  - ESP color
+### Planned Features
 
-- **MISC**
-  - Bunnyhop (in certain games removes the function of slowing down after touching the ground)
-  - Speedhack (not yet functional)
+### Aimbot
+- Aimbot (Hold RMB to aim at enemies)
+- Team Check
 
-**Screenshots**
+### Visuals
+- Player boxes
+- Aimbot FOV
+- FOV radius
+- ESP color
 
-Screenshot from the popular game arsenal:
+### MISC
+- Bunnyhop (in certain games removes the slowdown after touching the ground)
+- Speedhack (not yet functional)
+
+---
+
+## Screenshots
+
+**Arsenal (popular Roblox FPS game)**  
 ![Screenshot 2025-05-26 154249](https://github.com/user-attachments/assets/dbad24e3-bc75-40dd-9e51-fca9a690fb47)
 
-Screenshot from another popular game rivals
+**Rivals (another popular game)**  
 ![Screenshot 2025-05-26 154356](https://github.com/user-attachments/assets/72c12f9f-3658-481e-8e5d-5a5be31dd5aa)
+
+---
+
+## Join Our Discord  
+[https://discord.gg/89Z9MGQN9J](https://discord.gg/89Z9MGQN9J)
