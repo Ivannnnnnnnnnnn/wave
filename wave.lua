@@ -5,10 +5,10 @@ local splashText = Instance.new("TextLabel", splashGui)
 splashText.Size = UDim2.new(0, 300, 0, 100)
 splashText.Position = UDim2.new(0.5, -150, 0.5, -50)
 splashText.Text = "Wave"
-splashText.TextColor3 = Color3.new(1, 1, 1)
 splashText.Font = Enum.Font.SourceSansBold
 splashText.TextScaled = true
 splashText.BackgroundTransparency = 1
+splashText.TextColor3 = Color3.fromRGB(0, 102, 204)
 
 task.spawn(function()
     local start = tick()
@@ -18,12 +18,31 @@ task.spawn(function()
         local t = tick() - start
         local yOffset = math.sin(t * math.pi * 2) * 10
         splashText.Position = UDim2.new(0.5, -150, 0.5, -50 + yOffset)
+        local progress = t / duration
+        if progress < 0.5 then
+            local interp = progress / 0.5
+            splashText.TextColor3 = Color3.new(
+                0 + (173/255 * interp),
+                102/255 + (216/255 - 102/255) * interp,
+                204/255 + (230/255 - 204/255) * interp
+            )
+        else
+            local interp = (progress - 0.5) / 0.5
+            splashText.TextColor3 = Color3.new(
+                173/255 + (1 - 173/255) * interp,
+                216/255 + (1 - 216/255) * interp,
+                230/255 + (1 - 230/255) * interp
+            )
+        end
+
         if t > duration - 1 then
             alpha = 1 - (t - (duration - 1))
             splashText.TextTransparency = 1 - alpha
         end
+
         task.wait()
     end
+
     splashGui:Destroy()
 end)
 
