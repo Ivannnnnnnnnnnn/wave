@@ -15,8 +15,8 @@
   - ESP color
 
 - **MISC**
-- Bunnyhop (in certain games removes the function of slowing down after touching the ground)
-- Speedhack (not yet functional)
+  - Bunnyhop (in certain games removes the function of slowing down after touching the ground)
+  - Speedhack (not yet functional)
 
 **Screenshots**
 
