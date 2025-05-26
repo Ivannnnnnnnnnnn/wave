@@ -5,6 +5,10 @@
 ## Join Our Discord  
 [https://discord.gg/89Z9MGQN9J](https://discord.gg/89Z9MGQN9J)
 
+## Join Our Telegram
+
+https://t.me/+6qniFrNOalcxYjE0
+
 ---
 
 ## Wave — Universal Roblox Cheat for Multiple Games
