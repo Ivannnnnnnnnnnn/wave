@@ -1,30 +1,34 @@
 local splashGui = Instance.new("ScreenGui", game.CoreGui)
 splashGui.Name = "WaveSplash"
 
-local frame = Instance.new("Frame", splashGui)
-frame.Size = UDim2.new(0, 300, 0, 100)
-frame.Position = UDim2.new(0.5, -150, 0.5, -50)
-frame.BackgroundTransparency = 1
-
-local gradient = Instance.new("UIGradient", frame)
-gradient.Rotation = 0
-gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 102, 204)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(173, 216, 230)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+local letters = {"W", "a", "v", "e"}
+local colors = {
+    Color3.fromRGB(0, 102, 204),
+    Color3.fromRGB(70, 150, 230),
+    Color3.fromRGB(173, 216, 230),
+    Color3.fromRGB(255, 255, 255)
 }
 
-local splashText = Instance.new("TextLabel", frame)
-splashText.Size = UDim2.new(1, 0, 1, 0)
-splashText.BackgroundTransparency = 1
-splashText.Text = "Wave"
-splashText.Font = Enum.Font.SourceSansBold
-splashText.TextScaled = true
-splashText.TextColor3 = Color3.new(1, 1, 1)
+local letterLabels = {}
 
-local stroke = Instance.new("TextStroke", splashText)
-stroke.Transparency = 0.5
-stroke.Color = Color3.fromRGB(0, 70, 140)
+local totalWidth = 300
+local letterWidth = totalWidth / #letters
+local height = 100
+local startX = 0.5 - (totalWidth / 2) / splashGui.AbsoluteSize.X
+
+for i, letter in ipairs(letters) do
+    local lbl = Instance.new("TextLabel", splashGui)
+    lbl.Size = UDim2.new(0, letterWidth, 0, height)
+    lbl.Position = UDim2.new(startX + ((i-1)*letterWidth) / splashGui.AbsoluteSize.X, 0, 0.5, -height/2)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = letter
+    lbl.Font = Enum.Font.SourceSansBold
+    lbl.TextScaled = true
+    lbl.TextColor3 = colors[i]
+    lbl.TextStrokeTransparency = 0.5
+    lbl.TextStrokeColor3 = Color3.fromRGB(0, 70, 140)
+    letterLabels[i] = lbl
+end
 
 task.spawn(function()
     local start = tick()
@@ -33,16 +37,24 @@ task.spawn(function()
     while tick() - start < duration do
         local t = tick() - start
         local yOffset = math.sin(t * math.pi * 2) * 10
-        frame.Position = UDim2.new(0.5, -150, 0.5, -50 + yOffset)
-        gradient.Offset = Vector2.new((t * 2) % 1, 0)
-        if t > duration - 1 then
-            alpha = 1 - (t - (duration - 1))
-            splashText.TextTransparency = 1 - alpha
-            stroke.Transparency = 0.5 + 0.5 * (1 - alpha)
-            gradient.Transparency = NumberSequence.new(1 - alpha)
+
+        for i, lbl in ipairs(letterLabels) do
+            lbl.Position = UDim2.new(
+                lbl.Position.X.Scale,
+                lbl.Position.X.Offset,
+                0.5,
+                -height/2 + yOffset
+            )
+            if t > duration - 1 then
+                alpha = 1 - (t - (duration - 1))
+                lbl.TextTransparency = 1 - alpha
+                lbl.TextStrokeTransparency = 0.5 + 0.5 * (1 - alpha)
+            end
         end
+
         task.wait()
     end
+
     splashGui:Destroy()
 end)
 
