@@ -1,5 +1,5 @@
 ![bannerg](https://github.com/user-attachments/assets/a3f51eec-5ca9-40aa-bd53-2ec325da1b87)
-## V0.3.1 Prototype  
+## V0.3.2 Prototype  
 ⚠️ It currently works but I do **not guarantee safety** — **USE AT YOUR OWN RISK**
 
 ## Join Our Discord  
@@ -28,6 +28,7 @@ https://t.me/+6qniFrNOalcxYjE0
 ### MISC
 - Bunnyhop (in certain games removes the slowdown after touching the ground)
 - Speedhack (not yet functional)
+- AntiAim (partly works)
 
 ---
 
