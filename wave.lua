@@ -69,14 +69,15 @@ local settings = {
     aimEnabled = true,
     teamCheck = true,
     fovVisible = true,
-        bhopEnabled = false,
+    bhopEnabled = false,
     speedhackEnabled = false,
     speedValue = 20,
     fov = 100,
     aimPart = "Head",
     aimKey = Enum.UserInputType.MouseButton2,
     espColor = Color3.fromRGB(255, 0, 0),
-    menuOpen = true
+    menuOpen = true,
+    antiAimEnabled = false,
 }
 
 local espBoxes = {}
@@ -112,7 +113,7 @@ end
 local function getClosest()
     local closest, dist = nil, math.huge
     for _, p in ipairs(Players:GetPlayers()) do
-        if isEnemy(p) and p.Character:FindFirstChild(settings.aimPart) then
+        if isEnemy(p) and p.Character and p.Character:FindFirstChild(settings.aimPart) then
             local pos, onScreen = Camera:WorldToViewportPoint(p.Character[settings.aimPart].Position)
             if onScreen then
                 local mag = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
@@ -125,18 +126,30 @@ local function getClosest()
     return closest
 end
 
-if settings.bhopEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-    local humanoid = LP.Character.Humanoid
-    if UIS:IsKeyDown(Enum.KeyCode.Space) and humanoid.FloorMaterial ~= Enum.Material.Air then
-        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+RunService.Heartbeat:Connect(function()
+    if settings.bhopEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        local humanoid = LP.Character.Humanoid
+        if UIS:IsKeyDown(Enum.KeyCode.Space) and humanoid.FloorMaterial ~= Enum.Material.Air then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
     end
-end
+end)
 
-if settings.speedhackEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-    LP.Character.Humanoid.WalkSpeed = settings.speedValue
-elseif LP.Character and LP.Character:FindFirstChild("Humanoid") then
-    LP.Character.Humanoid.WalkSpeed = 16
-end
+RunService.Heartbeat:Connect(function()
+    if settings.speedhackEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid.WalkSpeed = settings.speedValue
+    elseif LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if settings.antiAimEnabled and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = LP.Character.HumanoidRootPart
+        local pos = hrp.Position
+        hrp.CFrame = CFrame.new(pos.X, pos.Y - 100, pos.Z)
+    end
+end)
 
 RunService.RenderStepped:Connect(function()
     fovCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
@@ -212,100 +225,105 @@ local function makeToggle(name, y, settingKey)
     toggle.Size = UDim2.new(0, 130, 0, 25)
     toggle.Text = name .. ": " .. (settings[settingKey] and "ON" or "OFF")
     toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    toggle.TextColor3 = Color3.new(1, 1, 1)
-    toggle.TextSize = 16
+    toggle.TextColor3 = Color3.new(1,1,1)
+    toggle.Font = Enum.Font.SourceSans
+    toggle.TextSize = 18
+
     toggle.MouseButton1Click:Connect(function()
         settings[settingKey] = not settings[settingKey]
         toggle.Text = name .. ": " .. (settings[settingKey] and "ON" or "OFF")
     end)
+
     table.insert(uiElements, toggle)
 end
 
-local function makeSlider(name, y, min, max, settingKey)
-    local text = Instance.new("TextLabel", Frame)
-    text.Position = UDim2.new(0, 10, 0, y)
-    text.Size = UDim2.new(0, 150, 0, 20)
-    text.Text = name .. ": " .. settings[settingKey]
-    text.TextColor3 = Color3.new(1, 1, 1)
-    text.BackgroundTransparency = 1
-    text.TextSize = 14
-    table.insert(uiElements, text)
+local function makeSlider(name, y, settingKey, min, max)
+    local label = Instance.new("TextLabel", Frame)
+    label.Position = UDim2.new(0, 10, 0, y)
+    label.Size = UDim2.new(0, 280, 0, 20)
+    label.Text = name .. ": " .. tostring(settings[settingKey])
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1,1,1)
+    label.Font = Enum.Font.SourceSans
+    label.TextSize = 16
+    table.insert(uiElements, label)
 
     local slider = Instance.new("TextButton", Frame)
     slider.Position = UDim2.new(0, 10, 0, y + 20)
-    slider.Size = UDim2.new(0, 200, 0, 20)
-    slider.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    slider.Size = UDim2.new(0, 280, 0, 15)
+    slider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     slider.Text = ""
     table.insert(uiElements, slider)
 
-    slider.MouseButton1Down:Connect(function()
-        local conn
-        conn = RunService.RenderStepped:Connect(function()
-            local mouse = UIS:GetMouseLocation().X
-            local rel = math.clamp(mouse - slider.AbsolutePosition.X, 0, 200)
-            local value = math.floor(min + ((rel / 200) * (max - min)))
-            settings[settingKey] = value
-            text.Text = name .. ": " .. value
-        end)
-        UIS.InputEnded:Wait()
-        if conn then conn:Disconnect() end
+    local dragging = false
+
+    slider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+        end
+    end)
+    slider.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    slider.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local pos = input.Position.X - slider.AbsolutePosition.X
+            pos = math.clamp(pos, 0, slider.AbsoluteSize.X)
+            local val = min + (pos / slider.AbsoluteSize.X) * (max - min)
+            if settingKey == "speedValue" or settingKey == "fov" then
+                settings[settingKey] = math.floor(val)
+            else
+                settings[settingKey] = val
+            end
+            label.Text = name .. ": " .. tostring(settings[settingKey])
+        end
     end)
 end
 
-local function makeColorPicker(y)
-    local colorBtn = Instance.new("TextButton", Frame)
-    colorBtn.Position = UDim2.new(0, 10, 0, y)
-    colorBtn.Size = UDim2.new(0, 130, 0, 25)
-    colorBtn.Text = "ESP Color"
-    colorBtn.BackgroundColor3 = settings.espColor
-    colorBtn.TextColor3 = Color3.new(1, 1, 1)
-    colorBtn.MouseButton1Click:Connect(function()
-        local r = math.random(50, 255)
-        local g = math.random(50, 255)
-        local b = math.random(50, 255)
-        settings.espColor = Color3.fromRGB(r, g, b)
-        colorBtn.BackgroundColor3 = settings.espColor
-    end)
-    table.insert(uiElements, colorBtn)
-end
-
-local function updateUI()
+local function updateMenu()
     clearUI()
     if currentTab == "Aimbot" then
-        makeToggle("Aimbot", 70, "aimEnabled")
-        makeToggle("Team Check", 100, "teamCheck")
+        makeToggle("Enable Aim", 50, "aimEnabled")
+        makeToggle("Team Check", 80, "teamCheck")
+        makeToggle("Show FOV", 110, "fovVisible")
+        makeSlider("FOV Radius", 140, "fov", 10, 300)
     elseif currentTab == "Visuals" then
-        makeToggle("ESP", 70, "espEnabled")
-        makeToggle("Show FOV", 100, "fovVisible")
-        makeSlider("FOV Radius", 130, 10, 300, "fov")
-        makeColorPicker(180)
-    elseif currentTab == "Misc" then
-        makeToggle("Bunnyhop", 70, "bhopEnabled")
-        makeToggle("Speedhack", 100, "speedhackEnabled")
-        makeSlider("Speed", 130, 16, 100, "speedValue")
+        makeToggle("ESP Boxes", 50, "espEnabled")
+    elseif currentTab == "Local" then
+        makeToggle("Bunnyhop", 50, "bhopEnabled")
+        makeToggle("Speedhack", 80, "speedhackEnabled")
+        makeSlider("Speed", 110, "speedValue", 16, 100)
+        makeToggle("Anti-Aim", 140, "antiAimEnabled")
     end
 end
 
-local tabNames = {"Aimbot", "Visuals", "Misc"}
-for i, name in ipairs(tabNames) do
-    local tabBtn = Instance.new("TextButton", Frame)
-    tabBtn.Size = UDim2.new(0, 90, 0, 25)
-    tabBtn.Position = UDim2.new(0, 10 + ((i - 1) * 100), 0, 35)
-    tabBtn.Text = name
-    tabBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    tabBtn.TextColor3 = Color3.new(1, 1, 1)
-    tabBtn.TextSize = 14
-    tabBtn.MouseButton1Click:Connect(function()
-        currentTab = name
-        updateUI()
+local tabNames = {"Aimbot", "Visuals", "Local"}
+local tabButtons = {}
+
+for i, tab in ipairs(tabNames) do
+    local btn = Instance.new("TextButton", Frame)
+    btn.Text = tab
+    btn.Position = UDim2.new(0, (i-1)*100, 0, 30)
+    btn.Size = UDim2.new(0, 100, 0, 20)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 18
+    btn.MouseButton1Click:Connect(function()
+        currentTab = tab
+        updateMenu()
     end)
+    tabButtons[tab] = btn
 end
 
-UIS.InputBegan:Connect(function(input)
+updateMenu()
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
     if input.KeyCode == Enum.KeyCode.Insert then
         settings.menuOpen = not settings.menuOpen
         Frame.Visible = settings.menuOpen
     end
 end)
-
-updateUI()
