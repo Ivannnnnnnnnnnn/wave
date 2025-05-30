@@ -181,6 +181,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- GUI
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 ScreenGui.Name = "WaveMenu"
 ScreenGui.ResetOnSpawn = false
@@ -359,10 +360,6 @@ userNameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 UIS.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.Insert then
-        settings.menuOpen = not settings.menuOpen
-        Frame.Visible = settings.menuOpen
-    end
-end)
         settings.menuOpen = not settings.menuOpen
         Frame.Visible = settings.menuOpen
     end
