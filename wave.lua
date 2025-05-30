@@ -127,11 +127,19 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-RunService.Heartbeat:Connect(function()
-    if settings.speedhackEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = settings.speedValue
-    elseif LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = 16
+RunService.Stepped:Connect(function()
+    local char = LP.Character
+    if char and char:FindFirstChild("Humanoid") then
+        local hum = char.Humanoid
+        if settings.speedhackEnabled then
+            if hum.WalkSpeed ~= settings.speedValue then
+                hum.WalkSpeed = settings.speedValue
+            end
+        else
+            if hum.WalkSpeed ~= 16 then
+                hum.WalkSpeed = 16
+            end
+        end
     end
 end)
 
