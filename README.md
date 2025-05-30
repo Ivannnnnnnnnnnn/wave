@@ -1,5 +1,5 @@
 ![bannerg](https://github.com/user-attachments/assets/a3f51eec-5ca9-40aa-bd53-2ec325da1b87)
-## V0.3.2 Prototype  
+## V0.3.3 Prototype  
 ⚠️ It currently works but I do **not guarantee safety** — **USE AT YOUR OWN RISK**
 
 ## Join Our Discord  
