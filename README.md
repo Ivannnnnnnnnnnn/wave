@@ -18,11 +18,10 @@ https://t.me/+6qniFrNOalcxYjE0
 ### Aimbot
 - Aimbot (Hold RMB to aim at enemies)
 - Team Check
+- FOV radius
 
 ### Visuals
 - Player boxes
-- Aimbot FOV
-- FOV radius
 - ESP color
 
 ### MISC
