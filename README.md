@@ -34,8 +34,9 @@ https://t.me/+6qniFrNOalcxYjE0
 ## Screenshots
 
 **Arsenal (popular Roblox FPS game)**  
-![Screenshot 2025-05-30 001754](https://github.com/user-attachments/assets/c2625e9b-49a6-44d1-87d2-c336be95cfdf)
+![Screenshot 2025-05-30 180226](https://github.com/user-attachments/assets/ebab49b4-e74c-401f-9db1-270c710e07fd)
+
 
 **Rivals (another popular game)**  
-![Screenshot 2025-05-30 001656](https://github.com/user-attachments/assets/88ff3754-0ebc-4e03-90b7-ed71c1b11cfc)
+![Screenshot 2025-05-30 180321](https://github.com/user-attachments/assets/ba5a8543-f8c2-4133-8407-f515b96434aa)
 
