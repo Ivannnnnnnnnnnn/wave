@@ -1,4 +1,7 @@
 ![bannerg](https://github.com/user-attachments/assets/a3f51eec-5ca9-40aa-bd53-2ec325da1b87)
+
+## VERY OUTDATED DO NOT USE YOU WILL 100% GET BANNED!!!
+
 ## V0.3.3 Prototype  
 ⚠️ It currently works but I do **not guarantee safety** — **USE AT YOUR OWN RISK**
 
